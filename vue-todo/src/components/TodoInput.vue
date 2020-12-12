@@ -5,23 +5,34 @@
         <span class="addContainer" @click="addItem">
             <i class="fas fa-plus addBtn"></i>
         </span>
+        <Modal v-if="showModal" @close="showModal = false">
+            <h3 slot="header">경고 <i class="fas fa-window-close closeModalBtn" @click="showModal=false"></i></h3>
+            <h6 slot="body">빈값을 입력했습니다.</h6>
+        </Modal>
     </div>
 </template>
 
 <script>
+import Modal from "./common/modal.vue";
 export default {
     data:()=>{
         return {
             newTodoItem:"",
+            showModal:false,
         }
+    },
+    components:{
+        Modal:Modal,
     },
     methods:{
         addItem(){
-            if(this.newTodoItem !== null){
+            if(this.newTodoItem !== ""){
                 // console.log(this.newTodoItem);
-                let obj = {completed:false, item:this.newTodoItem}
-                localStorage.setItem(this.newTodoItem, JSON.stringify(obj));
-                this.clearInput()
+                this.$emit("addItem", this.newTodoItem)
+                this.clearInput();
+                console.log("add")
+            }else{
+                this.showModal = true;
             }
         },
         clearInput(){
@@ -55,5 +66,8 @@ input:focus{
 .addBtn{
     color:white;
     vertical-align: middle;
+}
+.closeModalBtn{
+    color:green;
 }
 </style>
