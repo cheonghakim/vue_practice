@@ -2,26 +2,44 @@
     <div class="inputBox shadow">
         <input type="text" v-model="newTodoItem" @keyup.enter="addItem">
         <!-- <button @click="addItem">add</button> -->
-        <span class="addContainer" @click="addItem">
+        <span class="addContainer" @click="addItem(newTodoItem)">
             <i class="fas fa-plus addBtn"></i>
         </span>
+        <Modal v-if="showModal" @close="showModal=false">
+            <h3 slot="header">
+                경고
+                <i class="fas fa-window-close closeModalBtn" @click="showModal=false"></i>
+            </h3>
+            <div slot="body">
+                아무것도 입력하지 않았습니다.
+            </div>
+        </Modal>
     </div>
 </template>
 
 <script>
+import Modal from './common/Modal.vue'
+import {mapMutations} from "vuex";
 export default {
     data:()=>{
         return {
             newTodoItem:"",
+            showModal:false,
         }
     },
+    components:{
+        Modal
+    },
     methods:{
+        ...mapMutations(["addItem"]),
+
         addItem(){
             if(this.newTodoItem !== null){
-                // console.log(this.newTodoItem);
-                let obj = {completed:false, item:this.newTodoItem}
-                localStorage.setItem(this.newTodoItem, JSON.stringify(obj));
+                
+                // this.$store.commit("addItem", this.newTodoItem);
                 this.clearInput()
+            }else{
+                this.showModal = !this.showModal;
             }
         },
         clearInput(){

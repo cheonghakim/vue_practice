@@ -1,53 +1,26 @@
 <template>
     <div>
-        <ul>
-            <li v-for="(item, index) in todoItems" :key="index" class="shadow">
-                <i class="fas fa-check" :class={checkBtnCompleted:item.completed} @click="toggleComplete(item, index)"></i>
+        <transition-group name="list" tag="ul">
+            <li v-for="(item, index) in this.fetchTodoItems" :key="index" class="shadow">
+                <i class="fas fa-check" :class={checkBtnCompleted:item.completed} @click="toggleComplete({item, index})"></i>
                 <span :class={textCompleted:item.completed}>{{item.item}}</span>
-                <span class="removeBtn" @click="removeTodo(item, index)">
+                <span class="removeBtn" @click="removeTodo({item, index})">
                     <i class="fas fa-trash"></i>
                 </span>
             </li>
-        </ul>
+        </transition-group>
     </div>
 </template>
 
 <script>
+import { mapGetters, mapMutations } from "vuex";
 export default {
-    data:()=>{
-        return {
-            todoItems:[],
-        }
-    },
-    created(){
-        if(localStorage.length > 0){
-            for(let i=0; i<localStorage.length; i++){
-                if(localStorage.key(i) !== "loglevel:webpack-dev-server"){
-                    // console.log(localStorage.getItem(localStorage.key(i)))
-                    this.todoItems.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
-                    // this.todoItems.push(localStorage.key(i));
-                }
-            }
-        }
-    },
     methods:{
-        removeTodo:function(todo, index){
-            localStorage.removeItem(todo);
-            this.todoItems.splice(index, 1);
-        },
-        toggleComplete:function(item, index){
-            console.log(index, item.completed)
-            item.completed = !item.completed;
-            localStorage.removeItem(item);
-            localStorage.setItem(item, JSON.parse(item))
-        },
+        ...mapMutations({removeTodo:"removeItem",}),
+        ...mapMutations(["toggleComplete"]),
     },
-    watch:{
-        todoItems:function(){
-            for(let i in this.todoItems){
-                console.log("todoItems:"+this.todoItems[i])
-            }
-        },
+    computed:{
+        ...mapGetters(["fetchTodoItems"])
     }
 }
 </script>
@@ -93,4 +66,12 @@ li{
     text-decoration: line-through;
     color:#b3adad;
 }
+/* list transition */
+    .list-enter-active, .list-leave-active {
+    transition: all 1s;
+    }
+    .list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+    opacity: 0;
+    transform: translateY(30px);
+    }
 </style>
